@@ -1,0 +1,23 @@
+{
+    "manifest_version": 3,
+    "name": "ZyCapture",
+    "version": "1.0",
+    "permissions": ["activeTab", "scripting"],
+    "host_permissions": ["*://learn.zybooks.com/*"],
+    "content_scripts": [
+      {
+        "matches": ["*://learn.zybooks.com/zybook/*"],
+        "js": ["content.js", "jquery.min.js", "html2canvas.min.js"],
+        "run_at": "document_end"
+      }
+    ],
+    "action": {
+      "default_popup": "popup.html",
+      "_default_icon": {
+        "16": "images/icon16.png",
+        "48": "images/icon48.png",
+        "128": "images/icon128.png"
+      }
+    }
+  }
+  
