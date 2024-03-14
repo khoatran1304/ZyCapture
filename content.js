@@ -1,5 +1,36 @@
-// Function to check for the presence of the element
-//Capture the content of the body
+// import { ACTIONS, THEMES } from './constants.js';
+const EXTENSION = {
+    BADGE_COLOR: "#9688F1",
+}
+
+const ACTIONS = {
+    UPDATE_BADGE: 'update_badge',
+}
+
+const THEMES = {
+    DARK_MODE: {
+        header: {
+            backdropFilter: 'blur(10px)',
+            backgroundColor: 'rgba(29,30,33,.56)',
+        },
+
+        container: {
+            backgroundColor: '#000',
+        },
+
+        card: {
+            backgroundColor: '#0d0d0e',
+        },
+
+        text: {
+            primary: '#fff',
+        }
+    
+    }
+}
+
+
+
 const capture = function (div, options){
     let fileName = div.querySelector('.activity-title').innerText;
 
@@ -17,8 +48,12 @@ const capture = function (div, options){
 
 const init = function() {
     const challenges = document.querySelectorAll('.interactive-activity-container');
-    if (challenges.length !== 0) {
-        alert(challenges.length); // Debug
+    const counter = challenges.length;
+    if (counter !== 0) {
+
+        // alert(challenges.length); // Debug
+        updateBadgeMsg(counter);
+
         for (let i = 0; i < challenges.length; i++) {
             const button = document.createElement('button');
             button.textContent = 'SAVE';
@@ -29,6 +64,8 @@ const init = function() {
         console.log('Element not found yet. Retrying...');
         setTimeout(init, 1000); // Check again after 3 seconds
     }
+
+    applyTheme();
 }
 
 const assignType = function(div)
@@ -89,5 +126,77 @@ const captureSourcecode = function(div) {
 }
 
 
+const applyTheme = function() {
+    const topToolbars = document.querySelector('.top-toolbar');
+    Object.assign(topToolbars.style, THEMES.DARK_MODE.header);
+
+    const container = document.querySelector('.route-container');
+    Object.assign(container.style, THEMES.DARK_MODE.container);
+
+    const cards = document.querySelectorAll('.zb-card');
+    cards.forEach((card) => {
+        // card.style.backgroundColor = "";
+        Object.assign(card.style, THEMES.DARK_MODE.card);
+    });
+
+    const resource = document.querySelectorAll('.static-container, .content-resource, .participation, .challenge');
+    resource.forEach((res) => {
+        // card.style.backgroundColor = "";
+        // Object.assign(res.style, THEMES.DARK_MODE.card);
+        res.style.backgroundColor = 'transparent';
+    });
+
+    //text color
+    const allElements = document.querySelectorAll('*');
+    allElements.forEach(element => {
+        if ((element.classList.contains('static-container')
+            ||element.classList.contains('activity-instructions')
+            ||element.classList.contains('ember-view')
+            ||element.tagName.toLowerCase() == 'pre')
+            && !element.classList.contains('activity-title-bar')
+        ) {
+            // Change the text color to white
+            element.style.color = '#ffffff';
+        }
+    });
+
+    const titles = document.querySelectorAll('.activity-title-bar');
+    titles.forEach(title => 
+    {
+        title.style.color = 'black';
+    })
+
+    const tables = document.querySelectorAll('.sortable');
+    tables.forEach(table => 
+    {
+        table.style.color = 'black';
+    })
+
+    const objects = document.querySelectorAll('object');
+    objects.forEach(object => 
+    {
+        object.style.backgroundColor = 'wheat';
+    })
+
+    const boxes = document.querySelectorAll('.n, .na, .k');
+    boxes.forEach(box => 
+    {
+        box.style.color = 'white';
+    })
+
+};
 
 init();
+
+// MESSAGE SECTION
+
+// Send message to background script to update badge text
+const updateBadgeMsg = function(text)
+{
+    chrome.runtime.sendMessage(
+        { action: ACTIONS.UPDATE_BADGE, value: text}, 
+        ( response ) => {
+            console.log(response.message);
+        }
+    );
+} 
