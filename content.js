@@ -11,6 +11,9 @@ const THEMES = {
     DARK_MODE: 85,
 }
 
+const MAX_RETRIES = 5;
+let retryCount = 0;
+
 
 
 const capture = function (div, options){
@@ -28,26 +31,64 @@ const capture = function (div, options){
     });
 }
 
+// Create the button element
+const getButtonUI = function(name){
+    const button = document.createElement('button');
+    button.className = 'downloadBtn';
+    button.textContent = name;
+
+    // Style the button
+    button.style.backgroundColor = '#4CAF50';
+    button.style.border = 'none';
+    button.style.color = 'white';
+    button.style.padding = '15px 32px';
+    button.style.textAlign = 'center';
+    button.style.textDecoration = 'none';
+    button.style.display = 'inline-block';
+    button.style.fontSize = '16px';
+    button.style.margin = '4px 2px';
+    button.style.cursor = 'pointer';
+    button.style.borderRadius = '8px';
+    button.style.transitionDuration = '0.4s';
+
+    // Add hover effect
+    button.addEventListener('mouseover', function() {
+        button.style.backgroundColor = '#45a049';
+    });
+
+    button.addEventListener('mouseout', function() {
+        button.style.backgroundColor = '#4CAF50';
+    });
+
+    return button;
+}
+
 const init = function() {
     const challenges = document.querySelectorAll('.interactive-activity-container');
     const counter = challenges.length;
     if (counter !== 0) {
-
         // alert(challenges.length); // Debug
         updateBadgeMsg(counter);
 
         for (let i = 0; i < challenges.length; i++) {
-            const button = document.createElement('button');
-            button.textContent = 'SAVE';
+            const button = getButtonUI("Download");
             button.addEventListener('click', () => assignType(challenges[i]))
             challenges[i]?.querySelector('.activity-title-bar').appendChild(button);
         }
+
+        //reset counter
+        retryCount = 0;
+
     } else {
         console.log('Element not found yet. Retrying...');
-        setTimeout(init, 1000); // Check again after 3 seconds
+        retryCount++;
+        if (retryCount <= MAX_RETRIES) {
+            setTimeout(init, 1000); // Check again after 1 second
+        } else {
+            console.log('Max retries exceeded. Stopping retrying.');
+        }
     }
-
-    applyTheme();
+    
 }
 
 const assignType = function(div)
@@ -107,15 +148,15 @@ const captureSourcecode = function(div) {
     }, 1000); // Check every 1 second
 }
 
-const applyDarkMode = function()
-{
-    document.documentElement.style.filter = document.documentElement.style.filter ? '' : `invert(${THEMES.DARK_MODE}%)`
-}
 
-applyDarkMode();
 init();
 
 // MESSAGE SECTION
+// Darkmode lmao
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    document.documentElement.style.filter = request.enableDarkMode ? `invert(${THEMES.DARK_MODE}%)` : '';
+    chrome.storage.sync.set({ 'darkModeEnabled': request.enableDarkMode });
+});
 
 // Send message to background script to update badge text
 const updateBadgeMsg = function(text)

@@ -4,12 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ZyCapture</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="popup.js"></script>
 </head>
 <body>
-    <h1>ZyCapture</h1>
-    <p>Donation & Contribution please contact Minh &hearts;</p>
-    <footer>
-        <p>&copy; <span id="currentYear">2024</span> Minh Tran</p>
-    </footer>
+    <div class="app-container">
+        <div class="title-bar">
+            <h1>ZyCapture</h1>
+            <!-- <img src="kawaii_icon.png" alt="Kawaii Icon"> -->
+        </div>
+        <div class="stack-container">
+            <div class="settings-panel">
+                <!-- Settings panel content goes here -->
+                <div class="item-panel">
+                    <p class="item-panel__title">Dark Mode</p>
+                    <label class="switch">
+                        <input type="checkbox" id="darkmodeCbx">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                
+            </div>
+        </div>
+        
+        <footer>
+            <p style="text-align: right;">&copy; <span id="currentYear">2024</span> Minh &hearts;</p>
+        </footer>
+    </div>
 </body>
 </html>
