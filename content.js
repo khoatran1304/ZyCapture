@@ -8,25 +8,7 @@ const ACTIONS = {
 }
 
 const THEMES = {
-    DARK_MODE: {
-        header: {
-            backdropFilter: 'blur(10px)',
-            backgroundColor: 'rgba(29,30,33,.56)',
-        },
-
-        container: {
-            backgroundColor: '#000',
-        },
-
-        card: {
-            backgroundColor: '#0d0d0e',
-        },
-
-        text: {
-            primary: '#fff',
-        }
-    
-    }
+    DARK_MODE: 85,
 }
 
 
@@ -125,67 +107,12 @@ const captureSourcecode = function(div) {
     }, 1000); // Check every 1 second
 }
 
+const applyDarkMode = function()
+{
+    document.documentElement.style.filter = document.documentElement.style.filter ? '' : `invert(${THEMES.DARK_MODE}%)`
+}
 
-const applyTheme = function() {
-    const topToolbars = document.querySelector('.top-toolbar');
-    Object.assign(topToolbars.style, THEMES.DARK_MODE.header);
-
-    const container = document.querySelector('.route-container');
-    Object.assign(container.style, THEMES.DARK_MODE.container);
-
-    const cards = document.querySelectorAll('.zb-card');
-    cards.forEach((card) => {
-        // card.style.backgroundColor = "";
-        Object.assign(card.style, THEMES.DARK_MODE.card);
-    });
-
-    const resource = document.querySelectorAll('.static-container, .content-resource, .participation, .challenge');
-    resource.forEach((res) => {
-        // card.style.backgroundColor = "";
-        // Object.assign(res.style, THEMES.DARK_MODE.card);
-        res.style.backgroundColor = 'transparent';
-    });
-
-    //text color
-    const allElements = document.querySelectorAll('*');
-    allElements.forEach(element => {
-        if ((element.classList.contains('static-container')
-            ||element.classList.contains('activity-instructions')
-            ||element.classList.contains('ember-view')
-            ||element.tagName.toLowerCase() == 'pre')
-            && !element.classList.contains('activity-title-bar')
-        ) {
-            // Change the text color to white
-            element.style.color = '#ffffff';
-        }
-    });
-
-    const titles = document.querySelectorAll('.activity-title-bar');
-    titles.forEach(title => 
-    {
-        title.style.color = 'black';
-    })
-
-    const tables = document.querySelectorAll('.sortable');
-    tables.forEach(table => 
-    {
-        table.style.color = 'black';
-    })
-
-    const objects = document.querySelectorAll('object');
-    objects.forEach(object => 
-    {
-        object.style.backgroundColor = 'wheat';
-    })
-
-    const boxes = document.querySelectorAll('.n, .na, .k');
-    boxes.forEach(box => 
-    {
-        box.style.color = 'white';
-    })
-
-};
-
+applyDarkMode();
 init();
 
 // MESSAGE SECTION
@@ -200,3 +127,64 @@ const updateBadgeMsg = function(text)
         }
     );
 } 
+
+//backup
+// const applyTheme = function() {
+//     const topToolbars = document.querySelector('.top-toolbar');
+//     Object.assign(topToolbars.style, THEMES.DARK_MODE.header);
+
+//     const container = document.querySelector('.route-container');
+//     Object.assign(container.style, THEMES.DARK_MODE.container);
+
+//     const cards = document.querySelectorAll('.zb-card');
+//     cards.forEach((card) => {
+//         // card.style.backgroundColor = "";
+//         Object.assign(card.style, THEMES.DARK_MODE.card);
+//     });
+
+//     const resource = document.querySelectorAll('.static-container, .content-resource, .participation, .challenge');
+//     resource.forEach((res) => {
+//         // card.style.backgroundColor = "";
+//         // Object.assign(res.style, THEMES.DARK_MODE.card);
+//         res.style.backgroundColor = 'transparent';
+//     });
+
+//     //text color
+//     const allElements = document.querySelectorAll('*');
+//     allElements.forEach(element => {
+//         if ((element.classList.contains('static-container')
+//             ||element.classList.contains('activity-instructions')
+//             ||element.classList.contains('ember-view')
+//             ||element.tagName.toLowerCase() == 'pre')
+//             && !element.classList.contains('activity-title-bar')
+//         ) {
+//             // Change the text color to white
+//             element.style.color = '#ffffff';
+//         }
+//     });
+
+//     const titles = document.querySelectorAll('.activity-title-bar');
+//     titles.forEach(title => 
+//     {
+//         title.style.color = 'black';
+//     })
+
+//     const tables = document.querySelectorAll('.sortable');
+//     tables.forEach(table => 
+//     {
+//         table.style.color = 'black';
+//     })
+
+//     const objects = document.querySelectorAll('object');
+//     objects.forEach(object => 
+//     {
+//         object.style.backgroundColor = 'wheat';
+//     })
+
+//     const boxes = document.querySelectorAll('.n, .na, .k');
+//     boxes.forEach(box => 
+//     {
+//         box.style.color = 'white';
+//     })
+
+// };
