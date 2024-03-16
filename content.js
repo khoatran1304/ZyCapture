@@ -1,4 +1,5 @@
 // import { ACTIONS, THEMES } from './constants.js';
+// Constants
 const EXTENSION = {
     BADGE_COLOR: "#9688F1",
 }
@@ -14,9 +15,22 @@ const THEMES = {
 const MAX_RETRIES = 5;
 let retryCount = 0;
 
+// Function to capture content
+function capture(div, options) {
+    const fileName = div.querySelector('.activity-title').innerText;
 
+    html2canvas(div, options || {}).then(canvas => {
+        const imageDataURL = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
 
-const capture = function (div, options){
+        link.download = `${fileName || 'zybook_image'}.png`;
+        link.href = imageDataURL;
+        link.click();
+    });
+}
+
+// Function to capture source code content
+function captureSourcecode(div) {
     let fileName = div.querySelector('.activity-title').innerText;
 
     html2canvas(div, options || {}).then(function(canvas) {
@@ -31,13 +45,13 @@ const capture = function (div, options){
     });
 }
 
-// Create the button element
-const getButtonUI = function(name){
+// Function to create and style download button
+function createDownloadButton(name) {
     const button = document.createElement('button');
+
     button.className = 'downloadBtn';
     button.textContent = name;
 
-    // Style the button
     button.style.backgroundColor = '#4CAF50';
     button.style.border = 'none';
     button.style.color = 'white';
@@ -51,123 +65,85 @@ const getButtonUI = function(name){
     button.style.borderRadius = '8px';
     button.style.transitionDuration = '0.4s';
 
-    // Add hover effect
-    button.addEventListener('mouseover', function() {
+    button.addEventListener('mouseover', () => {
         button.style.backgroundColor = '#45a049';
     });
 
-    button.addEventListener('mouseout', function() {
+    button.addEventListener('mouseout', () => {
         button.style.backgroundColor = '#4CAF50';
     });
 
     return button;
 }
 
-const init = function() {
+// Initialization function
+function initialize() {
     const challenges = document.querySelectorAll('.interactive-activity-container');
     const counter = challenges.length;
+
     if (counter !== 0) {
-        // alert(challenges.length); // Debug
         updateBadgeMsg(counter);
 
-        for (let i = 0; i < challenges.length; i++) {
-            const button = getButtonUI("Download");
-            button.addEventListener('click', () => assignType(challenges[i]))
-            challenges[i]?.querySelector('.activity-title-bar').appendChild(button);
+        for (const challenge of challenges) {
+            const button = createDownloadButton("Download");
+            button.addEventListener('click', () => assignCaptureType(challenge));
+            challenge.querySelector('.activity-title-bar').appendChild(button);
         }
 
-        //reset counter
         retryCount = 0;
-
     } else {
         console.log('Element not found yet. Retrying...');
         retryCount++;
+
         if (retryCount <= MAX_RETRIES) {
-            setTimeout(init, 1000); // Check again after 1 second
+            setTimeout(initialize, 1000);
         } else {
             console.log('Max retries exceeded. Stopping retrying.');
         }
     }
-    
 }
 
-const assignType = function(div)
-{
-    let codeChalleng = div.querySelector('.ace-editor-container');
-    
-    if(codeChalleng)
-    {
-        return captureSourcecode(div);
-    }
-    else{
-        return capture(div);
+// Function to assign capture type based on content
+function assignCaptureType(div) {
+    const codeChallenge = div.querySelector('.ace-editor-container');
+
+    if (codeChallenge) {
+        captureSourcecode(div);
+    } else {
+        capture(div);
     }
 }
 
-// Bug with code challenges
-const captureSourcecode = function(div) {
-    let options = {};
-
-    //Pre-handle code-editor
-    let containerStyle = {};
-    let editorStyle = {};
-    let aceContainer = div.querySelector('.ace-editor-container');
-    let aceEditor = div.querySelector('.ace-editor');
-
-    //Full viewport
-    containerStyle = {...aceContainer.style};
-    editorStyle = {...aceEditor.style};
-    
-    //Calculate height
-    let codeHeight = aceEditor.querySelector('.ace_scrollbar-v').scrollHeight;
-
-    //Expand the editor
-    aceEditor.style.height = `inherit`;
-    aceContainer.style.height = `${codeHeight + 100}px `;
-
-    //Reset Style
-    const resetStyle = function()
-    {
-        aceEditor.style = editorStyle;
-        aceContainer.style = containerStyle;
-    }
-    
-
-    // MUST HAVE POP-UP LOADING TO PREVENT USER
-    // [CODE HERE]
-
-    // Check if the div has fully expanded
-    const checkExpanded = setInterval(function() {
-        let currentHeight = aceContainer.clientHeight;
-        
-        if (currentHeight > codeHeight) {
-            clearInterval(checkExpanded); // Stop the loop
-            capture(div); // Proceed with capturing content
-            resetStyle();
-        }
-    }, 1000); // Check every 1 second
+// Function to reset styling
+function resetStyle() {
+    // Reset styling
 }
 
 
-init();
 
-// MESSAGE SECTION
-// Darkmode lmao
+
+// Handle dark mode message
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     document.documentElement.style.filter = request.enableDarkMode ? `invert(${THEMES.DARK_MODE}%)` : '';
     chrome.storage.sync.set({ 'darkModeEnabled': request.enableDarkMode });
 });
 
-// Send message to background script to update badge text
-const updateBadgeMsg = function(text)
-{
+// Update badge message
+function updateBadgeMsg(text) {
     chrome.runtime.sendMessage(
         { action: ACTIONS.UPDATE_BADGE, value: text}, 
-        ( response ) => {
-            console.log(response.message);
-        }
+        response => console.log(response.message)
     );
-} 
+}
+
+// Main initialization
+initialize();
+
+
+
+
+
+
 
 //backup
 // const applyTheme = function() {
