@@ -8,6 +8,10 @@ const ACTIONS = {
     UPDATE_BADGE: 'update_badge',
 }
 
+const DEFAULT_VALUES = {
+    BADGE_WAIT: '...',
+}
+
 const THEMES = {
     DARK_MODE: 85,
 }
@@ -81,16 +85,18 @@ function initialize() {
     const challenges = document.querySelectorAll('.interactive-activity-container');
     const counter = challenges.length;
 
-    if (counter !== 0) {
-        updateBadgeMsg(counter);
+    updateBadgeMsg(counter);
 
+    if (counter !== 0) {
         for (const challenge of challenges) {
             const button = createDownloadButton("Download");
             button.addEventListener('click', () => assignCaptureType(challenge));
             challenge.querySelector('.activity-title-bar').appendChild(button);
         }
 
+        //RESET GLOBAL RETRY VARIABLE
         retryCount = 0;
+
     } else {
         console.log('Element not found yet. Retrying...');
         retryCount++;
@@ -140,7 +146,14 @@ function updateBadgeMsg(text) {
 initialize();
 
 
-
+chrome.runtime.onMessage.addListener(
+    function(request, sender, sendResponse) {
+        // listen for messages sent from background.js
+    if (request.message === 'Content.Refresh') {
+        console.log('Content.Refresh') // new url is now in content scripts!
+        initialize();
+    }
+});
 
 
 

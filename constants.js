@@ -21,7 +21,7 @@ const THEMES = {
     DARK_MODE: {
         header: {
             backdropFilter: 'blur(10px)',
-            backgroundColor: 'rgba(29,30,33,.56)',
+            backgroundColor: '',
         },
 
         container: {

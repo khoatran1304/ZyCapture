@@ -1,0 +1,39 @@
+/* To modify css the website */
+/* Can modify any things included variables */
+/* use !important at the last of attribute to overwrite */
+
+/* 
+:root {
+    --header: rgba(29, 30, 33, 0.56);
+    --container: #0d0d0e;
+    --card: #1e1e1e;
+    --text: #fff;
+    --flex: transparent;
+}
+
+.toolbar, .top-toolbar {
+    backdrop-filter: blur(10px) !important;
+    background-color: var(--header) !important;
+}
+
+.zb-button, .zb-icon, .bread-crumbs > a, li, span {
+    color: var(--text) !important;
+}
+
+.route-container {
+    background-color: var(--container) !important;
+}
+
+.zb-card {
+    background-color: var(--card) !important;
+
+    color: var(--text) !important;
+}
+
+.previous, .static-container, .content-resource, .participation, .challenge {
+    background-color: var(--flex) !important;
+}
+ */
+
+
+ /* Tesing */
