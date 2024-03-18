@@ -1,4 +1,7 @@
 /* styles.css */
+:root{
+  --background: #f57c00;
+}
 
 /* General styles */
 body {
@@ -21,7 +24,7 @@ body {
 .title-bar h1 {
     margin: 0;
     font-size: 1.4rem;
-    color: #f57c00; /* Hot pink */
+    color: var(--background); /* Hot pink */
 }
 
 .title-bar img {
@@ -62,6 +65,7 @@ body {
 
     display: flex;
     flex-direction: column;
+    gap: 1rem;
 }
 
 .item-panel {
@@ -75,7 +79,7 @@ body {
     font-size: 1rem;
     line-height: 1rem;
     font-weight: 600;
-
+    text-align: left;
 }
 .app-container{
     margin: 0 20px;
@@ -128,11 +132,11 @@ body {
   }
   
   input:checked + .slider {
-    background-color: #f57c00;
+    background-color: var(--background);
   }
   
   input:focus + .slider {
-    box-shadow: 0 0 1px #f57c00;
+    box-shadow: 0 0 1px var(--background);
   }
   
   input:checked + .slider:before {
@@ -148,4 +152,11 @@ body {
   
   .slider.round:before {
     border-radius: 50%;
+  }
+
+
+
+  .brightness_slider {
+    width: 100px;
+
   }

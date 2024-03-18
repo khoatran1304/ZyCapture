@@ -15,8 +15,9 @@ const ACTIONS = {
     
     RECEIVE: 
     {
-        CHANGE_THEME: 'change_theme',
         CHANGE_ROUTE: 'change_route',
+        CHANGE_THEME: 'change_theme',
+        CHANGE_BRIGHTNESS: 'change_brightness',
     }
 }
 
@@ -124,7 +125,14 @@ function updateTheme(theme) {
     chrome.storage.sync.set({ 'theme': theme });
 }
 
+function updateBrightness(brightness){
+    const unit = brightness/100;
 
+    //use for body only, use for root will complict with invert()
+    document.body.style.filter = `brightness(${unit})`;
+
+    chrome.storage.sync.set({ 'brightness': brightness });
+}
 // Initialization function
 function initialize() {
     const challenges = document.querySelectorAll('.interactive-activity-container');
@@ -176,12 +184,18 @@ chrome.runtime.onMessage.addListener(
         
         switch(action)
         {
+            case ACTIONS.RECEIVE.CHANGE_ROUTE:
+                initialize();
+                break;
+
             case ACTIONS.RECEIVE.CHANGE_THEME:
                 const theme = request.theme;
                 updateTheme(theme);
                 break;
-            case ACTIONS.RECEIVE.CHANGE_ROUTE:
-                initialize();
+            
+            case ACTIONS.RECEIVE.CHANGE_BRIGHTNESS:
+                const brightness = request.brightness;
+                updateBrightness(brightness);
                 break;
 
             default:
