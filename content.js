@@ -1,3 +1,6 @@
+// Used to handle UI of webpage
+
+
 // import { ACTIONS, THEMES } from './constants.js';
 // Constants
 const EXTENSION = {
@@ -5,7 +8,16 @@ const EXTENSION = {
 }
 
 const ACTIONS = {
-    UPDATE_BADGE: 'update_badge',
+    CALL: 
+    {   
+        UPDATE_BADGE: 'update_badge',
+    },
+    
+    RECEIVE: 
+    {
+        CHANGE_THEME: 'change_theme',
+        CHANGE_ROUTE: 'change_route',
+    }
 }
 
 const DEFAULT_VALUES = {
@@ -13,7 +25,7 @@ const DEFAULT_VALUES = {
 }
 
 const THEMES = {
-    DARK_MODE: 85,
+    DARK_MODE: 'darkmode',
 }
 
 const MAX_RETRIES = 5;
@@ -80,17 +92,57 @@ function createDownloadButton(name) {
     return button;
 }
 
+// Function to assign capture type based on content
+function assignCaptureType(div) {
+    const codeChallenge = div.querySelector('.ace-editor-container');
+
+    if (codeChallenge) {
+        captureSourcecode(div);
+    } else {
+        capture(div);
+    }
+}
+
+function updateTheme(theme) {
+
+    switch(theme)
+    {   
+        case THEMES.DARK_MODE:
+            document.documentElement.style.filter = `invert(82%)`;
+            break;
+
+        // case THEMES.DARK_MODE:
+        //     handle UI
+        //     break;
+
+        default:
+            //reset css
+            document.documentElement.style.filter = '';
+            break;
+    }
+   
+    chrome.storage.sync.set({ 'theme': theme });
+}
+
+
 // Initialization function
 function initialize() {
     const challenges = document.querySelectorAll('.interactive-activity-container');
     const counter = challenges.length;
 
-    updateBadgeMsg(counter);
+    //call background to update popup
+    chrome.runtime.sendMessage({ action: ACTIONS.CALL.UPDATE_BADGE, value: counter}, response => console.log(response.message));
 
     if (counter !== 0) {
         for (const challenge of challenges) {
+
+            //create HTML + CSS
             const button = createDownloadButton("Download");
+
+            //assign action to button
             button.addEventListener('click', () => assignCaptureType(challenge));
+
+            //inject to webpage
             challenge.querySelector('.activity-title-bar').appendChild(button);
         }
 
@@ -109,51 +161,35 @@ function initialize() {
     }
 }
 
-// Function to assign capture type based on content
-function assignCaptureType(div) {
-    const codeChallenge = div.querySelector('.ace-editor-container');
-
-    if (codeChallenge) {
-        captureSourcecode(div);
-    } else {
-        capture(div);
-    }
-}
-
-// Function to reset styling
-function resetStyle() {
-    // Reset styling
-}
 
 
-
-
-// Handle dark mode message
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    document.documentElement.style.filter = request.enableDarkMode ? `invert(${THEMES.DARK_MODE}%)` : '';
-    chrome.storage.sync.set({ 'darkModeEnabled': request.enableDarkMode });
-});
-
-// Update badge message
-function updateBadgeMsg(text) {
-    chrome.runtime.sendMessage(
-        { action: ACTIONS.UPDATE_BADGE, value: text}, 
-        response => console.log(response.message)
-    );
-}
 
 // Main initialization
 initialize();
 
 
 chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {
+    (request, sender, sendResponse) => {
         // listen for messages sent from background.js
-    if (request.message === 'Content.Refresh') {
-        console.log('Content.Refresh') // new url is now in content scripts!
-        initialize();
+
+        const action = request.request;
+        
+        switch(action)
+        {
+            case ACTIONS.RECEIVE.CHANGE_THEME:
+                const theme = request.theme;
+                updateTheme(theme);
+                break;
+            case ACTIONS.RECEIVE.CHANGE_ROUTE:
+                initialize();
+                break;
+
+            default:
+                console.log('Content Action Not Match With ' + action);
+                break;
+        }
     }
-});
+);
 
 
 
