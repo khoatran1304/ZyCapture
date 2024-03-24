@@ -1,56 +1,55 @@
 document.addEventListener('DOMContentLoaded', initialize);
 
-
+// Only Handle UI popup
+// Store Value to storage, send message, and retrieve from content.js
 function initialize() {
     const themeCheckBox = document.getElementById('darkmodeCbx');
     const brightnessSlider = document.getElementById('brightnessSlider');
 
-    
-    //handle checkbox UI match with current theme
+    // Handle checkbox UI match with current theme
     chrome.storage.sync.get('theme', function(store) {
         themeCheckBox.checked = store.theme === 'darkmode';
     });
 
-    // [error when retrieve from store]
-    // chrome.storage.sync.get('brightness', function(store) {
-    //     if (chrome.runtime.lastError) {
-    //         console.error(chrome.runtime.lastError);
-    //     } else {
-    //         brightnessSlider.value = store.brightness || 100; // Default value if brightness is not found
-    //     }
-    // });
+    // Retrieve brightness value from storage
+    chrome.storage.sync.get('brightness', function(store) {
+        brightnessSlider.value = store.brightness || 100;
+    });
+    
 
-
-    //catch change event from checkbox
+    // Catch change event from checkbox
     themeCheckBox.addEventListener('change', function() {
         const isChecked = themeCheckBox.checked;
         const theme = isChecked ? 'darkmode' : '';
 
+        chrome.storage.sync.set({ 'theme': theme });
+
         chrome.tabs.query(
             { 
                 active: true, 
                 currentWindow: true 
             },
             (tabs) => {
-                console.log('Sending message to content script');
-                chrome.tabs.sendMessage(tabs[0].id, { request: 'change_theme', theme: theme });
+                chrome.tabs.sendMessage(tabs[0].id, { request: 'change_theme'});
             }
         );
     });
 
+    // Catch change event from brightness slider
     brightnessSlider.addEventListener('change', function() {
-        const brightnessValue = this.value;
+        const brightness = this.value;
         
+        chrome.storage.sync.set({ 'brightness': brightness });
+
         chrome.tabs.query(
             { 
                 active: true, 
                 currentWindow: true 
             },
             (tabs) => {
-                console.log('Sending message to content script');
-                chrome.tabs.sendMessage(tabs[0].id, { request: 'change_brightness', brightness: brightnessValue });
+                
+                chrome.tabs.sendMessage(tabs[0].id, { request: 'change_brightness'});
             }
         );
     });
-
 }

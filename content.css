@@ -9,7 +9,12 @@
     --card: #1e1e1e;
     --text: #fff;
     --flex: transparent;
+    --download: rgb(76, 175, 80);
+
+    --editor: #323232;
+
 }
+
 
 .toolbar, .top-toolbar {
     backdrop-filter: blur(10px) !important;
@@ -33,7 +38,23 @@
 .previous, .static-container, .content-resource, .participation, .challenge {
     background-color: var(--flex) !important;
 }
- */
 
+.activity-title-bar, .activity-title-bar > * {
+    background-color: var(--card) !important;
+}
+
+.ace-zyautumn{
+    background-color: var(--editor) !important;
+    color: var(--text) !important;
+}
+
+.downloadBtn {
+    background-color: var(--download) !important;
+}
+
+.ace-zyautumn .ace_gutter{
+    background-color: #3b3b3b !important;
+    color: rgb(153,153,153) !important;
+} */
 
  /* Tesing */

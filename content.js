@@ -104,39 +104,47 @@ function assignCaptureType(div) {
     }
 }
 
-function updateTheme(theme) {
+function fetchTheme() {
+    chrome.storage.sync.get('theme', (store) => {
+        const theme =  store.theme || '';
 
-    switch(theme)
-    {   
-        case THEMES.DARK_MODE:
-            document.documentElement.style.filter = `invert(82%)`;
-            break;
+        switch(theme)
+        {   
+            case THEMES.DARK_MODE:
+                document.documentElement.style.filter = `invert(82%)`;
+                break;
 
-        // case THEMES.DARK_MODE:
-        //     handle UI
-        //     break;
+            // case THEMES.DARK_MODE:
+            //     handle UI
+            //     break;
 
-        default:
-            //reset css
-            document.documentElement.style.filter = '';
-            break;
-    }
-   
-    chrome.storage.sync.set({ 'theme': theme });
+            default:
+                //reset css
+                document.documentElement.style.filter = '';
+                break;
+        }
+    });
 }
 
-function updateBrightness(brightness){
-    const unit = brightness/100;
+function fetchBrightness(){
+    chrome.storage.sync.get('brightness', (store) => 
+    {
+        const brightness = store.brightness || 100;
 
-    //use for body only, use for root will complict with invert()
-    document.body.style.filter = `brightness(${unit})`;
-
-    chrome.storage.sync.set({ 'brightness': brightness });
+        //use for body only, use for root will complict with invert()
+        document.body.style.removeProperty('filter');
+        document.body.style.setProperty('filter',`brightness(${brightness}%)`,'important');
+    });
 }
+
 // Initialization function
 function initialize() {
     const challenges = document.querySelectorAll('.interactive-activity-container');
     const counter = challenges.length;
+
+    //set brightness
+    fetchTheme();
+    fetchBrightness();
 
     //call background to update popup
     chrome.runtime.sendMessage({ action: ACTIONS.CALL.UPDATE_BADGE, value: counter}, response => console.log(response.message));
@@ -181,6 +189,8 @@ chrome.runtime.onMessage.addListener(
         // listen for messages sent from background.js
 
         const action = request.request;
+
+        console.log(action);
         
         switch(action)
         {
@@ -189,17 +199,16 @@ chrome.runtime.onMessage.addListener(
                 break;
 
             case ACTIONS.RECEIVE.CHANGE_THEME:
-                const theme = request.theme;
-                updateTheme(theme);
+                fetchTheme();
                 break;
             
             case ACTIONS.RECEIVE.CHANGE_BRIGHTNESS:
-                const brightness = request.brightness;
-                updateBrightness(brightness);
+                fetchBrightness();
                 break;
 
             default:
                 console.log('Content Action Not Match With ' + action);
+                initialize();
                 break;
         }
     }
