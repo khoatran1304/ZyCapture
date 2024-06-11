@@ -3,7 +3,6 @@ console.log("background running");
 
 // import { ACTIONS, EXTENSION } from './modules/constants.js';
 
-
 const EXTENSION = {
     BADGE_COLOR: "#9688F1",
 }

@@ -18,6 +18,7 @@ const ACTIONS = {
         CHANGE_ROUTE: 'change_route',
         CHANGE_THEME: 'change_theme',
         CHANGE_BRIGHTNESS: 'change_brightness',
+        CALL_SOLVER: 'call_solver'
     }
 }
 
@@ -137,6 +138,31 @@ function fetchBrightness(){
     });
 }
 
+
+//Quiz Resolver
+const delay = function(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
+
+const solver = async function () {
+    const questions = document.querySelectorAll(".question-set-question");
+    let i = 1;
+    let total = questions.length;
+
+    for (const question of questions) {
+        // Send message to the popup
+        chrome.runtime.sendMessage({ 
+            action: "update_solver",
+            message: `${i++}/${total}`
+        });
+
+        await solveQuestion(question);
+    }   
+}
+
+
 // Initialization function
 function initialize() {
     const challenges = document.querySelectorAll('.interactive-activity-container');
@@ -205,6 +231,10 @@ chrome.runtime.onMessage.addListener(
             case ACTIONS.RECEIVE.CHANGE_BRIGHTNESS:
                 fetchBrightness();
                 break;
+            
+            case ACTIONS.RECEIVE.CALL_SOLVER:
+                solver();
+                break;
 
             default:
                 console.log('Content Action Not Match With ' + action);
@@ -215,6 +245,76 @@ chrome.runtime.onMessage.addListener(
 );
 
 
+// -------------Problem Solving Scripts------------------
+async function solveQuestion(question) 
+{
+    //debug
+    console.log(question.classList);
+
+    // Scroll to the current question element
+    question.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    // Ignore the case checked
+    const marker = question.querySelector('.zb-chevron');
+    if(marker.classList.contains('check')) return;
+
+    // category and solve
+    question.classList.contains(problems.FILLOUT_CLASS) && await problems.fillOut(question);
+    question.classList.contains(problems.MULTICHOICE_CLASS) && await problems.multiChoice(question);
+}
+
+const problems = 
+{
+    FILLOUT_CLASS: "short-answer-question",
+    MULTICHOICE_CLASS: "multiple-choice-question",
+
+    fillOut: async (question) => 
+            {
+                // Hidden explanation
+                const explanation = question.querySelector(".zb-explanation");
+                explanation.style.visibility = "hidden";
+
+                // Show answer
+                const showButton = question.querySelector(".show-answer-button");
+                showButton.click();
+
+                // Wait for a short delay before clicking again (simulate human-like behavior)
+                await delay(1000);
+                showButton.click();
+
+                // Set answer after a short delay
+                await delay(1000);
+                const answerSpan = question.querySelector(".forfeit-answer");
+                const answerInput = question.querySelector(".zb-text-area");
+                const answerText = answerSpan.textContent.trim(); // Get the text content and remove leading/trailing whitespace
+                answerInput.value = answerText;
+                const inputEvent = new Event('input', { bubbles: true });
+                answerInput.dispatchEvent(inputEvent);
+
+                // Submit after a short delay
+                await delay(1000);
+                const checkButton = question.querySelector(".check-button");
+                checkButton.click();
+
+                // Show explanation
+                explanation.style.visibility = "visible";
+            },
+
+    multiChoice: async (question) => 
+            {
+                const choices = question.querySelectorAll('input[type="radio"]');
+                const result = document.querySelector('.zb-explanation');
+
+                choices.forEach(async element => 
+                {
+                    element.click();
+
+                    await delay(500);
+                    
+                    if(result.classList.contains('correct')) return;
+                });
+            } 
+}
 
 
 //backup
