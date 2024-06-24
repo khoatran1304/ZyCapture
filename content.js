@@ -159,7 +159,33 @@ const solver = async function () {
         });
 
         await solveQuestion(question);
-    }   
+    }
+    
+    // await animationSolver();         //demo
+}
+
+const animationSolver = async function() {
+
+    const animations = document.querySelectorAll(".animation-player-content-resource");
+
+    //x2 speed
+    animations.forEach(a => {
+        const checkbox = a.querySelector("div.zb-checkbox > input[type=checkbox]");
+        if (checkbox) {
+            checkbox.checked = true; // Check the checkbox
+        }
+    });
+
+    //start
+    animations.forEach(async a => {
+        const button = a.querySelector("button.zb-button");
+        if (button) button.click();
+    });
+
+    
+    //manage steps and click start
+
+
 }
 
 
@@ -303,17 +329,22 @@ const problems =
     multiChoice: async (question) => 
             {
                 const choices = question.querySelectorAll('input[type="radio"]');
-                const result = document.querySelector('.zb-explanation');
+                const result = question.querySelector('.zb-explanation');
 
-                choices.forEach(async element => 
+                for (let element of choices) 
                 {
                     element.click();
 
                     await delay(500);
-                    
-                    if(result.classList.contains('correct')) return;
-                });
+
+                    // // Check if the result contains the 'correct' class
+                    if (result.classList.contains('correct'))   
+                    {
+                        return;
+                    }
+                }
             } 
+    
 }
 
 
